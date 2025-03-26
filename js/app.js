@@ -8,7 +8,7 @@ function fetchTasks() {
 	fetch(API_URL)
 		.then((res) => {
 			if (!res.ok) {
-				alert(res.status);
+				throw new Error(res);
 			}
 
 			return res.json();
@@ -41,6 +41,13 @@ function renderTodos(todos) {
 		const deleteButton = document.createElement('button');
 		deleteButton.className = 'delete-button';
 		deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+
+		deleteButton.addEventListener('click', () => deleteTodo(todo.id));
+
+		if (todo.completed) {
+			todoText.style.textDecoration = 'line-through';
+			todoElement.style.opacity = '0.3';
+		}
 
 		todoElement.appendChild(checkbox);
 		todoElement.appendChild(todoText);
@@ -132,6 +139,23 @@ async function toggleTodoCompletionStatus(id, completed) {
 			body: JSON.stringify({
 				completed: !completed,
 			}),
+		});
+
+		if (!response.ok) {
+			throw new Error(response);
+		}
+
+		fetchTasks();
+	} catch (error) {
+		alert(error);
+	}
+}
+
+// DELETE requests
+async function deleteTodo(id) {
+	try {
+		const response = await fetch(`${API_URL}/${id}`, {
+			method: 'DELETE',
 		});
 
 		if (!response.ok) {
