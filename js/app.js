@@ -20,6 +20,7 @@ function fetchTasks() {
 }
 
 function renderTodos(todos) {
+	tasksList.innerHTML = '';
 	todos.forEach((todo) => {
 		const todoElement = document.createElement('div');
 
@@ -51,4 +52,45 @@ function setRemainingTasksCount(todos) {
 	const remainingTodos = todos.filter((todo) => !todo.completed).length;
 
 	remainingTodosCount.textContent = remainingTodos;
+}
+
+// POST requests
+const addTodoForm = document.querySelector('#add-task-form');
+const todoInput = document.querySelector('#task-input');
+
+addTodoForm.addEventListener('submit', captureTextInput);
+
+function captureTextInput(e) {
+	e.preventDefault();
+
+	const text = todoInput.value.trim();
+
+	if (text) {
+		addNewTodo(text);
+		e.target.reset();
+	}
+}
+
+// async await fetch syntax
+async function addNewTodo(textFromInput) {
+	try {
+		const response = await fetch(API_URL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				title: textFromInput,
+				completed: false,
+			}),
+		});
+
+		if (!response.ok) {
+			alert(response.status);
+		}
+
+		fetchTasks();
+	} catch (error) {
+		alert(error);
+	}
 }
