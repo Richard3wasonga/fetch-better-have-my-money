@@ -31,6 +31,10 @@ function renderTodos(todos) {
 		checkbox.className = 'checkbox';
 		checkbox.checked = todo.completed;
 
+		checkbox.addEventListener('change', () =>
+			toggleTodoCompletionStatus(todo.id, todo.completed)
+		);
+
 		const todoText = document.createElement('span');
 		todoText.textContent = todo.title;
 
@@ -87,6 +91,51 @@ async function addNewTodo(textFromInput) {
 
 		if (!response.ok) {
 			alert(response.status);
+		}
+
+		fetchTasks();
+	} catch (error) {
+		alert(error);
+	}
+}
+
+/*
+function addNewTodo(textFromInput) {
+	fetch(API_URL, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			title: textFromInput,
+			completed: false,
+		}),
+	})
+		.then((res) => {
+			if (!response.ok) {
+				alert(response.status);
+			}
+		})
+		.then(fetchTasks);
+}
+*/
+
+// PATCH requests
+
+async function toggleTodoCompletionStatus(id, completed) {
+	try {
+		const response = await fetch(`${API_URL}/${id}`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				completed: !completed,
+			}),
+		});
+
+		if (!response.ok) {
+			throw new Error(response);
 		}
 
 		fetchTasks();
